@@ -56,7 +56,7 @@ export default function ResetPassword() {
         
         {/* Header */}
         <div className="bg-gradient-to-b from-[#EAF0EC] to-[#FDFBF7] pt-6 pb-4 px-6 text-center border-b border-gray-50">
-          <h1 className="text-2xl font-bold text-[#2D5A27]">ربيع القلوب</h1>
+          <h1 className="text-2xl font-bold text-[#2D5A27]">ربيع قلوبنا</h1>
           <p className="text-xs text-[#B38F36] font-semibold mt-0.5">إعادة تعيين كلمة المرور</p>
         </div>
 

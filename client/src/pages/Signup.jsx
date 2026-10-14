@@ -1,26 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import API from '../api/axios';
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import CustomInput from '../components/CustomInput';
 
-// قائمة احتياطية مضمونة 100%
+// Liste de secours (Fallback) au cas où l'API met du temps ou échoue
 const FALLBACK_COUNTRIES = [
-  { name: "المغرب", code: "+212", flag: "🇲🇦" },
-  { name: "السعودية", code: "+966", flag: "🇸🇦" },
-  { name: "مصر", code: "+20", flag: "🇪🇬" },
-  { name: "الجزائر", code: "+213", flag: "🇩🇿" },
-  { name: "تونس", code: "+216", flag: "🇹🇳" },
-  { name: "الإمارات العربية المتحدة", code: "+971", flag: "🇦🇪" },
-  { name: "قطر", code: "+974", flag: "🇶🇦" },
-  { name: "الكويت", code: "+965", flag: "🇰🇼" },
-  { name: "تركيا", code: "+90", flag: "🇹🇷" },
-  { name: "فرنسا", code: "+33", flag: "🇫🇷" },
-  { name: "إسبانيا", code: "+34", flag: "🇪🇸" },
-  { name: "ألمانيا", code: "+49", flag: "🇩🇪" },
-  { name: "المملكة المتحدة", code: "+44", flag: "🇬🇧" },
-  { name: "الولايات المتحدة", code: "+1", flag: "🇺🇸" }
+  { name: "Morocco", code: "+212", flag: "🇲🇦" },
+  { name: "Saudi Arabia", code: "+966", flag: "🇸🇦" },
+  { name: "Egypt", code: "+20", flag: "🇪🇬" },
+  { name: "Algeria", code: "+213", flag: "🇩🇿" },
+  { name: "Tunisia", code: "+216", flag: "🇹🇳" },
+  { name: "France", code: "+33", flag: "🇫🇷" },
+  { name: "Spain", code: "+34", flag: "🇪🇸" },
+  { name: "Turkey", code: "+90", flag: "🇹🇷" },
+  { name: "United States", code: "+1", flag: "🇺🇸" }
 ];
 
 export default function Signup() {
@@ -35,33 +29,42 @@ export default function Signup() {
     phoneCode: '+212',
     phoneNumber: '',
     password: '',
-    country: 'المغرب'
+    country: 'Morocco'
   });
 
   useEffect(() => {
-    axios.get('https://restcountries.com/v3.1/all?fields=name,cca2,idd,flag,translations')
-      .then(res => {
-        if (Array.isArray(res.data) && res.data.length > 0) {
-          const formatted = res.data
-            .filter(c => c.cca2 !== 'IL' && c.name?.common !== 'Israel')
-            .map(c => {
-              const root = c.idd?.root || '';
-              const suffixes = c.idd?.suffixes || [];
-              const code = (suffixes.length === 1) ? `${root}${suffixes[0]}` : root;
-              
-              return {
-                name: c.translations?.ara?.common || c.name?.common || '',
-                code: code || '',
-                flag: c.flag || '🏳️'
-              };
-            })
-            .filter(c => c.name !== '' && c.code !== '')
-            .sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+    // Appel de l'API des pays avec fetch comme demandé
+    fetch('https://restcountries.com/v3.1/all')
+      .then(response => response.json())
+      .then(data => {
+        // Trier les pays par nom commun
+        const sortedCountries = data.sort((a, b) => 
+          (a.name?.common || '').localeCompare(b.name?.common || '')
+        );
+        
+        // Filtrer pour exclure "Israel"
+        const filteredCountries = sortedCountries.filter(
+          country => country.name?.common !== "Israel"
+        );
 
-          if (formatted.length > 0) setCountriesList(formatted);
+        // Formater les données pour inclure le nom, l'indicatif téléphonique et le drapeau
+        const formatted = filteredCountries.map(c => {
+          const root = c.idd?.root || '';
+          const suffixes = c.idd?.suffixes || [];
+          const code = (suffixes.length === 1) ? `${root}${suffixes[0]}` : root;
+          
+          return {
+            name: c.name?.common || '',
+            code: code || '',
+            flag: c.flag || '🏳️'
+          };
+        }).filter(c => c.name !== '' && c.code !== '');
+
+        if (formatted.length > 0) {
+          setCountriesList(formatted);
         }
       })
-      .catch(err => console.warn("استخدام قائمة الدول الاحتياطية", err));
+      .catch(error => console.error('Erreur lors de la récupération des pays:', error));
   }, []);
 
   const handleChange = (e) => {
@@ -136,7 +139,7 @@ export default function Signup() {
         
         {/* Header */}
         <div className="bg-gradient-to-b from-[#EAF0EC] to-[#FDFBF7] pt-6 pb-4 px-6 text-center border-b border-gray-50">
-          <h1 className="text-2xl font-bold text-[#2D5A27]">ربيع القلوب</h1>
+          <h1 className="text-2xl font-bold text-[#2D5A27]">ربيع قلوبنا</h1>
           <p className="text-xs text-[#B38F36] font-semibold mt-0.5">إنشاء حساب جديد</p>
         </div>
 
